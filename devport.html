@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahmed Sajid // Technical Portfolio</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,500&family=Rajdhani:wght@300;500;600&display=swap');
+
+        :root {
+            --bg-color: #1a1b26;
+            --sakura: #ffb7b2;
+            --sakura-dim: #ffb7b280;
+            --bone: #e0e0e0;
+            --glass: rgba(26, 27, 38, 0.85);
+            --border: rgba(255, 183, 178, 0.3);
+            --accent: #7aa2f7;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: var(--bg-color);
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--bone);
+        }
+
+        /* Texture Overlays */
+        .grain-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .vignette {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            background: radial-gradient(circle at center, transparent 40%, #0f1016 100%);
+        }
+
+        /* UI Layer */
+        #ui-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10;
+            pointer-events: none;
+            padding: 2rem;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        header {
+            border-left: 2px solid var(--sakura);
+            padding-left: 20px;
+            pointer-events: auto;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-style: italic;
+            font-weight: 300;
+            font-size: 2.5rem;
+            margin: 0;
+            color: var(--sakura);
+            text-shadow: 0 0 15px rgba(255, 183, 178, 0.3);
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            opacity: 0.8;
+            margin-top: 5px;
+            color: var(--accent);
+        }
+
+        .why-button {
+            margin-top: 1.5rem;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--sakura), var(--accent));
+            border: none;
+            color: var(--bg-color);
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(255, 183, 178, 0.4);
+            animation: pulse-glow 2s infinite;
+        }
+
+        .why-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 30px rgba(255, 183, 178, 0.6);
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 183, 178, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(255, 183, 178, 0.7); }
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            opacity: 0.6;
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            animation: pulse 3s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Why Ahmed Interactive Panel - Left Side */
+        .why-panel {
+            position: fixed;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 420px;
+            max-height: 80vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: linear-gradient(to right, rgba(26, 27, 38, 0.95), rgba(26, 27, 38, 0.85));
+            border-right: 2px solid var(--sakura);
+            padding: 2.5rem 2rem;
+            padding-right: 1.5rem;
+            z-index: 15;
+            pointer-events: auto;
+            opacity: 0;
+            transform: translateY(-50%) translateX(-100%);
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.5);
+            overscroll-behavior: contain;
+        }
+
+        /* Custom Scrollbar Styling */
+        .why-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .why-panel::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .why-panel::-webkit-scrollbar-thumb {
+            background: var(--sakura);
+            border-radius: 3px;
+            opacity: 0.5;
+        }
+
+        .why-panel::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        .why-panel.visible {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .why-panel h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.2rem;
+            color: var(--sakura);
+            margin: 0 0 0.5rem 0;
+            font-style: italic;
+            text-shadow: 0 0 15px rgba(255, 183, 178, 0.4);
+        }
+
+        .why-panel .tagline {
+            font-size: 0.95rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px;
+            opacity: 0.9;
+        }
+
+        .why-panel .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .why-panel .stat-item {
+            text-align: center;
+            padding: 0.75rem 0.5rem;
+            background: rgba(255, 183, 178, 0.08);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+        }
+
+        .why-panel .stat-item .number {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--sakura);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .why-panel .stat-item .label {
+            font-size: 0.7rem;
+            color: var(--bone);
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .why-panel .pitch {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--bone);
+            margin-bottom: 1.25rem;
+            opacity: 0.9;
+        }
+
+        .why-panel .pitch strong {
+            color: var(--sakura);
+            font-weight: 600;
+        }
+
+        .why-panel .value-props {
+            display: grid;
+            gap: 0.85rem;
+        }
+
+        .why-panel .value-prop {
+            display: flex;
+            align-items: start;
+            gap: 0.75rem;
+        }
+
+        .why-panel .value-prop .icon {
+            font-size: 1.2rem;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .why-panel .value-prop .text strong {
+            color: var(--accent);
+            display: block;
+            margin-bottom: 0.2rem;
+            font-size: 0.9rem;
+        }
+
+        .why-panel .value-prop .text span {
+            color: #b0b5c0;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        /* Toggle Button for Why Panel - Orbital Design */
+        .why-toggle {
+            position: fixed;
+            left: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            z-index: 17;
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            pointer-events: auto;
+        }
+
+        .why-toggle-orbit {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(180deg); }
+        }
+
+        .why-toggle-core {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--sakura), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow:
+                0 0 30px rgba(255, 183, 178, 0.6),
+                0 0 60px rgba(255, 183, 178, 0.3),
+                inset 0 2px 10px rgba(255, 255, 255, 0.3),
+                inset 0 -2px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .why-toggle:hover .why-toggle-core {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow:
+                0 0 40px rgba(255, 183, 178, 0.8),
+                0 0 80px rgba(255, 183, 178, 0.4),
+                inset 0 2px 10px rgba(255, 255, 255, 0.4),
+                inset 0 -2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .why-toggle-text {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--bg-color);
+            text-align: center;
+            line-height: 1.2;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            user-select: none;
+        }
+
+        .why-toggle-ring {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 2px solid var(--sakura);
+            opacity: 0.4;
+            animation: pulse-ring 2s ease-out infinite;
+        }
+
+        .why-toggle-ring:nth-child(1) {
+            width: 70px;
+            height: 70px;
+            animation-delay: 0s;
+        }
+
+        .why-toggle-ring:nth-child(2) {
+            width: 80px;
+            height: 80px;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes pulse-ring {
+            0% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.4;
+            }
+            50% {
+                opacity: 0.2;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.3);
+                opacity: 0;
+            }
+        }
+
+        .why-toggle-particles {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 4px;
+            height: 4px;
+            background: var(--sakura);
+            border-radius: 50%;
+            opacity: 0.6;
+        }
+
+        .why-toggle-particles:nth-child(3) {
+            animation: orbit 3s linear infinite;
+        }
+
+        .why-toggle-particles:nth-child(4) {
+            animation: orbit 3s linear infinite reverse;
+            animation-delay: -1.5s;
+        }
+
+        .why-toggle-particles:nth-child(5) {
+            animation: orbit 4s linear infinite;
+            animation-delay: -1s;
+        }
+
+        @keyframes orbit {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg) translateX(35px) rotate(0deg);
+            }
+            100% {
+                transform: translate(-50%, -50%) rotate(360deg) translateX(35px) rotate(-360deg);
+            }
+        }
+
+        .why-toggle.hidden {
+            left: 500px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            position: absolute;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 30vh;
+            width: 2px;
+            background: rgba(255,255,255,0.1);
+        }
+        .progress-bar {
+            width: 100%;
+            background: var(--sakura);
+            height: 0%;
+            transition: height 0.1s;
+            box-shadow: 0 0 10px var(--sakura);
+        }
+
+        /* Detail Modal */
+        #project-modal {
+            position: absolute;
+            top: 0; right: 0;
+            width: 50%;
+            max-width: 600px;
+            height: 100%;
+            background: linear-gradient(to left, var(--bg-color), rgba(26,27,38,0.95));
+            border-left: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            z-index: 20;
+            transform: translateX(100%);
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+            pointer-events: auto;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #project-modal.active {
+            transform: translateX(0);
+        }
+
+        .modal-content {
+            padding: 4rem 3rem;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease 0.3s;
+        }
+
+        #project-modal.active .modal-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 2rem;
+            color: var(--sakura);
+            cursor: pointer;
+            background: none;
+            border: none;
+            transition: transform 0.3s;
+            z-index: 30;
+            pointer-events: auto;
+            padding: 0.5rem;
+            line-height: 1;
+        }
+        .modal-close:hover {
+            transform: rotate(90deg);
+            color: var(--accent);
+        }
+
+        .tag {
+            display: inline-block;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            border-radius: 20px;
+        }
+
+        .modal-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            color: var(--bone);
+            margin: 0 0 1rem 0;
+            line-height: 1;
+        }
+
+        .modal-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .modal-section h3 {
+            color: var(--sakura);
+            font-size: 1.1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .modal-section p, .modal-section li {
+            color: #b0b5c0;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .modal-section ul { padding-left: 1.2rem; }
+
+        /* Canvas */
+        #canvas-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+        }
+
+        /* Why Modal - Center Overlay Style */
+        #why-modal {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+            overflow: hidden;
+        }
+
+        #why-modal.active {
+            display: flex;
+        }
+
+        #why-modal-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .why-content {
+            background: linear-gradient(135deg, var(--glass), rgba(26, 27, 38, 0.95));
+            border: 2px solid var(--sakura);
+            box-shadow: 0 0 50px rgba(255, 183, 178, 0.5);
+            padding: 3rem;
+            max-width: 700px;
+            width: 90%;
+            border-radius: 10px;
+            position: relative;
+            z-index: 1;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        #why-modal.active .why-content {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .why-content h2 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 3rem;
+            color: var(--sakura);
+            margin: 0 0 1.5rem 0;
+            text-align: center;
+            font-style: italic;
+            text-shadow: 0 0 20px rgba(255, 183, 178, 0.5);
+        }
+
+        .why-content .tagline {
+            font-size: 1.3rem;
+            color: var(--accent);
+            text-align: center;
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
+            font-weight: 500;
+        }
+
+        .why-content .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 183, 178, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+        }
+
+        .stat-item .number {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--sakura);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-item .label {
+            font-size: 0.85rem;
+            color: var(--bone);
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .why-content .pitch {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--bone);
+            margin-bottom: 2rem;
+        }
+
+        .why-content .pitch strong {
+            color: var(--sakura);
+            font-weight: 600;
+        }
+
+        .why-content .value-props {
+            display: grid;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .value-prop {
+            display: flex;
+            align-items: start;
+            gap: 1rem;
+        }
+
+        .value-prop .icon {
+            font-size: 1.5rem;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .value-prop .text {
+            flex: 1;
+        }
+
+        .value-prop .text strong {
+            color: var(--accent);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .value-prop .text span {
+            color: #b0b5c0;
+            font-size: 0.95rem;
+        }
+
+        .why-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            font-size: 2rem;
+            color: var(--sakura);
+            cursor: pointer;
+            background: none;
+            border: none;
+            transition: transform 0.3s;
+            padding: 0.5rem;
+            line-height: 1;
+        }
+
+        .why-close:hover {
+            transform: rotate(90deg);
+            color: var(--accent);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            #project-modal { width: 100%; max-width: 100%; }
+            .modal-content { padding: 3rem 1.5rem; }
+            h1 { font-size: 2rem; }
+            .why-panel {
+                width: 100%;
+                max-height: 70vh;
+                padding: 2rem 1.5rem;
+            }
+            .why-panel .stats { grid-template-columns: 1fr; }
+            .why-toggle.hidden { left: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="grain-overlay"></div>
+    <div class="vignette"></div>
+
+    <div id="ui-layer">
+        <header>
+            <h1>Ahmed Sajid</h1>
+            <div class="subtitle">Software Engineer // Computer Science @ UAlberta</div>
+        </header>
+
+        <div class="scroll-hint">
+            SCROLL TO NAVIGATE<br>CLICK NODE FOR DETAILS
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+    </div>
+
+    <!-- Why Ahmed Sliding Panel - Orbital Toggle -->
+    <div class="why-toggle" id="why-toggle" onclick="toggleWhyPanel()">
+        <div class="why-toggle-orbit">
+            <div class="why-toggle-ring"></div>
+            <div class="why-toggle-ring"></div>
+            <div class="why-toggle-particles"></div>
+            <div class="why-toggle-particles"></div>
+            <div class="why-toggle-particles"></div>
+            <div class="why-toggle-core">
+                <div class="why-toggle-text">WHY<br>AHMED?</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="why-panel" id="why-panel">
+        <h2>Why Ahmed?</h2>
+        <div class="tagline">Technical Versatility & Systems Engineering.</div>
+
+        <div class="pitch">
+            I build complex, production-ready software spanning 10 major projects and over 150,000 lines of code. My expertise covers the full spectrum of development, from memory-managed C++ engines to reactive mobile applications.
+        </div>
+
+        <div class="value-props">
+            <div class="value-prop">
+                <div class="text">
+                    <strong>1. Engineering & DSP Capabilities</strong>
+                </div>
+            </div>
+            <div class="value-prop">
+                <div class="text">
+                    <span>I solve problems that require understanding how data moves at the byte level.</span>
+                </div>
+            </div>
+            <div class="value-prop">
+                <div class="text">
+                    <span>Audio Processing: In Harmonizer, I implemented real-time signal processing pipelines, using FFT-based frequency analysis and algorithmic beat detection to manipulate audio streams.</span>
+                </div>
+            </div>
+            <div class="value-prop">
+                <div class="text">
+                    <span>Low-Level Debugging: I don't rely solely on high-level abstractions. I've patched buffer sizing bugs in llama.cpp to prevent crashes and rewrote velocity buffer logic to solve TAA ghosting artifacts in DirectX 12.</span>
+                </div>
+            </div>
+            <div class="value-prop">
+                <div class="text">
+                    <strong>2. Architectural Discipline</strong>
+                </div>
+            </div>
+            <div class="value-prop">
+                <div class="text">
+                    <span>I build systems designed for scalability and maintainability, not just rapid prototyping.</span>
+                </div>
+            </div>
+            <div class="value-prop">
+                <div class="text">
+                    <span>Production Patterns: My applications utilize strict MVVM and Repository architectures to ensure separation of concerns.</span>
+                </div>
+            </div>
+            <div class="value-prop">
+                <div class="text">
+                    <span>Concurrency & Safety: I implement thread-safe operations (WAL mode in SQLite, Semaphores in C#) and robust state management to handle race conditions and complex data flows.</span>
+                </div>
+            </div>
+            <div class="value-prop">
+                <div class="text">
+                    <strong>3. The Full Scope</strong>
+                </div>
+            </div>
+            <div class="value-prop">
+                <div class="text">
+                    <span>I am equally effective in low-level systems and high-level product development.</span>
+                </div>
+            </div>
+            <div class="value-prop">
+                <div class="text">
+                    <span>Systems: C++20, DirectX 12, HLSL, Python (AI/ML Integration).</span>
+                </div>
+            </div>
+            <div class="value-prop">
+                <div class="text">
+                    <span>Product: Kotlin (Jetpack Compose), C# (Avalonia), TypeScript (React).</span>
+                </div>
+            </div>
+            <div class="value-prop">
+                <div class="text">
+                    <span>Infrastructure: Docker, Firebase, Cloud Functions.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Modal -->
+    <div id="project-modal">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <div class="modal-content" id="modal-inner">
+            <!-- Content Injected via JS -->
+        </div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <!-- Import Map -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+        // --- Helper Functions (must be defined before use) ---
+
+        // Petal texture generator
+        function createPetalTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 32; canvas.height = 32;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.ellipse(16, 16, 8, 14, Math.PI / 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = 'white';
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // Abstract Flower Builder
+        let flowerInstances = [];
+        let petalSystem;
+
+        function createFlower(color, scale = 1) {
+            const group = new THREE.Group();
+            const petalPivots = [];
+
+            // Petals
+            for(let i = 0; i < 8; i++) {
+                const geo = new THREE.CircleGeometry(0.8 * scale, 32);
+                const mat = new THREE.MeshBasicMaterial({
+                    color: color,
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 0.3,
+                    wireframe: true
+                });
+                const petal = new THREE.Mesh(geo, mat);
+                petal.position.y = 0.5 * scale;
+
+                const pivot = new THREE.Group();
+                pivot.add(petal);
+                pivot.rotation.z = (i / 8) * Math.PI * 2;
+                pivot.rotation.x = 0.5;
+
+                group.add(pivot);
+                petalPivots.push(pivot);
+            }
+
+            // Center Core
+            const centerGeo = new THREE.SphereGeometry(0.2 * scale, 16, 16);
+            const centerMat = new THREE.MeshBasicMaterial({ color: PALETTE.white });
+            const center = new THREE.Mesh(centerGeo, centerMat);
+            group.add(center);
+
+            const instanceData = {
+                group: group,
+                petals: petalPivots,
+                offset: Math.random() * 100
+            };
+            flowerInstances.push(instanceData);
+
+            return group;
+        }
+
+        // --- Data: 10 Technical Projects ---
+        const projects = [
+            {
+                id: "cortex",
+                title: "CortexEngine",
+                subtitle: "Real-Time Graphics Engine",
+                tags: "C++20 / DirectX 12 / HLSL 6.6 / Llama.cpp",
+                description: "Professional-grade rendering engine combining low-level DirectX 12 graphics with AI-driven scene control. 60+ FPS at 1440p with PBR, ray tracing, and natural language commands.",
+                tech: [
+                    "<strong>Graphics Pipeline:</strong> Bindless resources (SM6.6), Per-mesh BLAS caching, Triple buffering, Ray-traced GI/shadows",
+                    "<strong>AI Integration:</strong> Local Llama.cpp inference with GBNF grammar constraints, 17+ command types, Thread-safe ECS communication",
+                    "<strong>Shaders (12 programs):</strong> PBR Cook-Torrance, Cascaded shadow maps, SSAO/SSR, Water with Gerstner waves, TAA",
+                    "<strong>Performance:</strong> GPU memory tracking, Conservative quality modes, Meshlet subdivision for RT"
+                ],
+                challenges: "Fixed token conversion buffer sizing bug in llama.cpp. Managed GPU memory pressure from 1-4GB HDR environment maps. Resolved temporal instability in TAA through dedicated HDR resolve passes and depth/normal-aware clamping."
+            },
+            {
+                id: "loclm",
+                title: "LocLM",
+                subtitle: "Desktop AI Coding Agent",
+                tags: "C# (Avalonia) / Python (FastAPI) / SQLite",
+                description: "Dual-stack desktop application bringing AI coding assistance to local development. MVVM frontend with Python subprocess backend handling LLM integration.",
+                tech: [
+                    "<strong>Architecture:</strong> Avalonia UI (MVVM), Python FastAPI subprocess (HTTP localhost:8000), SQLite WAL mode persistence",
+                    "<strong>Tool Middleware:</strong> Fuzzy matching (ls→list_directory), Argument normalization, Path security validation",
+                    "<strong>Agent Loop:</strong> 15-iteration limit, JSON extraction with fallback parsing, File diff generation",
+                    "<strong>Database:</strong> Schema versioning, Semaphore locking, Retention policies (max 200 sessions)"
+                ],
+                challenges: "Subprocess synchronization between C# and Python with careful startup handling. Tool extraction fragility from variable LLM outputs requiring multiple fallback strategies. Security trade-offs in workspace path validation."
+            },
+            {
+                id: "kife",
+                title: "KIFE (CodeScope)",
+                subtitle: "Multi-Language Code Intelligence",
+                tags: "Python / React / CodeBERT / FAISS / 12+ Languages",
+                description: "Semantic code search supporting 12+ programming languages with specialized AST parsers. 4,373 LOC backend, 1,627 LOC frontend, hybrid semantic + keyword ranking.",
+                tech: [
+                    "<strong>Multi-Language Parsers:</strong> Tree-sitter (Python), Regex patterns (JS/TS, Java, Kotlin, C/C++, C#, Go, Rust, Ruby, PHP, Bash, SQL, HTML/CSS)",
+                    "<strong>ML/Search:</strong> CodeBERT 768-dim embeddings, FAISS IndexFlatIP, BM25 text search, Hybrid ranking fusion",
+                    "<strong>RAG Integration:</strong> Groq LLM chatbot, Multi-turn context, Top-5 code snippet injection, Temperature 0.3",
+                    "<strong>Storage:</strong> SQLite normalized schema (files/symbols tables), ~1KB per symbol, 1MB per 1000 symbols"
+                ],
+                challenges: "Language coverage gaps in JSX, TypeScript generics, Go package imports. Docker resource limits (1200MB, 0.5 CPU). Memory pressure mitigation via 100-symbol batch processing."
+            },
+            {
+                id: "vertex",
+                title: "VertexLotto (pLUCK)",
+                subtitle: "Event Lottery System",
+                tags: "Kotlin / Jetpack Compose / Firebase",
+                description: "Production Android app with 82 Kotlin files, 26,176+ LOC, 23 screens. Event lottery with waitlist management, real-time notifications, and geolocation.",
+                tech: [
+                    "<strong>Architecture:</strong> MVVM with Repository pattern, 5 ViewModels, 11 Repositories, Material Design 3",
+                    "<strong>Firebase:</strong> Firestore real-time sync, Cloud Functions (Node.js serverless), FCM notifications, Anonymous Auth",
+                    "<strong>Features:</strong> Device-based frictionless auth, Transaction-safe lottery draws, QR check-in (ML Kit + ZXing), Geolocation mapping",
+                    "<strong>Cloudinary:</strong> Unsigned upload preset, Event posters, Profile images, WebP/AVIF optimization"
+                ],
+                challenges: "Ensuring atomic updates during lottery execution to prevent race conditions. Managing Firestore security rules complexity. Missing ViewModels for some screens and limited test coverage (5 files)."
+            },
+            {
+                id: "harmonizer",
+                title: "Harmonizer",
+                subtitle: "Creative Audio Lab",
+                tags: "Flask / React / Docker / TensorRT",
+                description: "Multi-service creative laboratory (4,256 LOC Flask) combining music analysis, AI image generation, code search, and social features with Docker orchestration.",
+                tech: [
+                    "<strong>Audio Processing:</strong> Librosa beat detection (HOP_LENGTH=512), Tatums-per-beat analysis, Jump-loop engine, Multi-format support",
+                    "<strong>AI/ML:</strong> Custom VAE (ConvEncoder/Decoder), TorchScript UNet (DDPM 1000 steps), BERT-tiny tokenizer, Gradient Boosting RL labeler",
+                    "<strong>Services:</strong> harmonizer:prod (999MB), codesniff:prod (1200MB), watchtower auto-restart, Persistent volumes",
+                    "<strong>OurSpace Social:</strong> PBKDF2-SHA256 (100k iterations), SQLite, Google OAuth, Profile customization"
+                ],
+                challenges: "Mobile responsiveness bugs (horizontal overflow, <12px text, <44px touch targets) fixed via media queries. CPU-only PyTorch slow (30-60s per image). Monolithic 4,256-line Flask app navigation complexity."
+            },
+            {
+                id: "codesniff",
+                title: "CodeSniff",
+                subtitle: "Semantic Code Search",
+                tags: "Python (FastAPI) / React / CodeBERT / FAISS",
+                description: "Hybrid search engine using transformer embeddings and BM25. 3,500+ LOC dual-stack with Tree-sitter Python parser and regex JS/TS support.",
+                tech: [
+                    "<strong>ML/NLP:</strong> CodeBERT 768-dim vectors, MD5-hashed embedding cache, Batch processing (8 symbols), CUDA auto-detect",
+                    "<strong>Search:</strong> FAISS HNSW index, BM25 with 50+ synonym pairs, 40% similarity threshold, Sub-100ms latency (10k symbols)",
+                    "<strong>Frontend:</strong> React TypeScript, Monaco Editor, Framer Motion 60fps, Debounced search (300ms), Tailwind CSS",
+                    "<strong>Backend:</strong> FastAPI lifespan manager, Tree-sitter AST parser, SQLite metadata, Groq RAG integration"
+                ],
+                challenges: "440MB model causes 2-3s cold starts. Language support limited to Python (Tree-sitter accurate) and JS/TS (regex patterns). Similarity threshold tuning for large codebases."
+            },
+            {
+                id: "circol",
+                title: "Circol",
+                subtitle: "Unified Music Platform",
+                tags: "Kotlin / Android / Ktor / Jetpack Compose",
+                description: "Ambitious unified music platform integrating Spotify, YouTube, and local audio into single queue. Monorepo with shared, backend, app modules.",
+                tech: [
+                    "<strong>Unified Playback:</strong> Abstract AudioSource interface, SpotifyAudioSource (SDK), YouTubeAudioSource (ExoPlayer), LocalAudioSource (MediaStore)",
+                    "<strong>Security:</strong> PKCE OAuth Flow (code verifier/challenge), JWT Auth (Auth0 4.4.0), Firebase Admin SDK",
+                    "<strong>Backend:</strong> Ktor Server (JVM 21), WebSocket support, In-memory repos (production needs DB), Spotify Web API client",
+                    "<strong>UI:</strong> Jetpack Compose, StateFlow reactive updates, Koin DI, Material Design 3 (#1DB954 green)"
+                ],
+                challenges: "50% complete - Spotify SDK AAR manual download needed, YouTube extraction endpoint not implemented, Local MediaStore logic incomplete, Queue management TODOs."
+            },
+            {
+                id: "sonic",
+                title: "Sonic Architect MK.III",
+                subtitle: "Audio Visualizer",
+                tags: "JavaScript ES6 / Three.js / Web Audio API",
+                description: "Comprehensive audio visualization with 32 JS modules, 12,840+ LOC, 11 distinct rendering modes. 32-band frequency analysis, beat detection, 100k+ particles at 60fps.",
+                tech: [
+                    "<strong>Audio:</strong> 32-band logarithmic (20Hz-20kHz), Energy-based beat detection, BPM autocorrelation (60-200), Spectral centroid/flatness",
+                    "<strong>Visualizers (11):</strong> Sphere (simplex noise), Galaxy (100k particles), Tunnel, Terrain, DNA Helix, Kaleidoscope, Nebula, Fireworks, Circuit Board",
+                    "<strong>Shaders:</strong> Simplex 3D noise FBM, Audio-reactive uniforms, Multi-octave displacement, Post-processing (Bloom, Chromatic aberration, Glitch, Scanlines)",
+                    "<strong>Performance:</strong> Quality LOD (10k-150k particles), 4 presets (Low/Medium/High/Ultra), Adaptive rendering, Memory cleanup"
+                ],
+                challenges: "PostProcessorManager incomplete (preset save/load fails). Mobile frame drops on high particle counts (CPU bottleneck). Safari limited WebGL/audio support. No build system (direct ESM)."
+            },
+            {
+                id: "venpod",
+                title: "VENPOD",
+                subtitle: "Voxel Physics Engine",
+                tags: "C++20 / DirectX 12 / HLSL Compute",
+                description: "GPU-accelerated cellular automata targeting 100M+ voxels at 60 FPS. 32-bit packed voxel state, sparse chunk management, volumetric DDA raycasting.",
+                tech: [
+                    "<strong>Voxel Representation:</strong> 32-bit packed (State flags, Velocity 3-bit, Variant, Material ID), Atomic operations (InterlockedCompareExchange)",
+                    "<strong>GPU Compute:</strong> [numthreads(8,8,8)] = 512 threads/group, Ping-pong buffers, Indirect dispatch, Wave intrinsics (WaveActiveBitOr)",
+                    "<strong>Optimization:</strong> Sparse 32³/64³ chunks, Per-chunk active state, Sleep timers, Wake-up chains, Checkerboard update pattern",
+                    "<strong>Rendering:</strong> Volumetric DDA ray marching, Empty space skipping, Normal estimation via gradient, Directional light + AO"
+                ],
+                challenges: "30% complete (Phase 1-2). Need full DDA raymarcher, chunk scanning, indirect execution, fluid pressure simulation, thermodynamics. Performance target: 256³ default (~64MB/buffer), scalable to 1024³ (1GB/buffer)."
+            },
+            {
+                id: "cv-ml",
+                title: "CMPUT 328 Assignments",
+                subtitle: "Computer Vision & Deep Learning",
+                tags: "PyTorch / Vision Transformers / GANs / Diffusion",
+                description: "9-assignment progression from logistic regression through state-of-the-art generative models. MNIST→CIFAR-10→Medical imaging→VAE→WGAN-GP→DDPM.",
+                tech: [
+                    "<strong>Assignments:</strong> 1) Logistic Regression (97% MNIST) 2) FFNN (56% CIFAR-10) 3) CNN (89.3% w/ augmentation) 4) ViT + LoRA (99% param reduction)",
+                    "<strong>Advanced:</strong> 5) YOLOv8n (97.3% mAP50) 6) Medical segmentation (ACDC 4D cardiac MRI) 7) 3-stage VAE logo generation 8) WGAN-GP stability",
+                    "<strong>Generative Models:</strong> Vanilla GAN vs WGAN-GP comparative analysis, DDPM U-Net with time embeddings, FID scores",
+                    "<strong>Deliverables:</strong> 111 Anki flashcards, HTML lessons, Comprehensive ablation studies, Per-class precision metrics"
+                ],
+                challenges: "Balancing model capacity vs overfitting. Handling 4D medical imaging with variable patient dimensions. GAN training instability vs WGAN-GP convergence. Diffusion sampling speed (1000 steps vs DDIM 50 steps)."
+            }
+        ];
+
+        // --- Config ---
+        const PALETTE = {
+            bg: 0x1a1b26,
+            line: 0x565f89,
+            highlight: 0xffb7b2, // Sakura Pink
+            accent: 0x7aa2f7,     // Blue
+            white: 0xe0e0e0
+        };
+
+        const config = {
+            helixRadius: 6,
+            helixHeight: 40, // Height of the spiral
+            cameraOffset: { x: 0, y: 0, z: 12 },
+            scrollSpeed: 0.001
+        };
+
+        let scrollProgress = 0; // 0 to 1
+        let targetScroll = 0;
+
+        // --- Scene Init ---
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(PALETTE.bg, 0.03);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.1;
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // --- Post Processing ---
+        const renderScene = new RenderPass(scene, camera);
+        const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+        bloomPass.threshold = 0.2;
+        bloomPass.strength = 1.2;
+        bloomPass.radius = 0.8;
+
+        const composer = new EffectComposer(renderer);
+        composer.addPass(renderScene);
+        composer.addPass(bloomPass);
+
+        // --- Assets ---
+        function createLabelTexture(text, sub) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024; canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            
+            // Title
+            ctx.font = '300 80px Cormorant Garamond';
+            ctx.fillStyle = '#ffb7b2';
+            ctx.textAlign = 'center';
+            ctx.fillText(text, 512, 100);
+
+            // Subtitle
+            ctx.font = '500 40px Rajdhani';
+            ctx.fillStyle = '#7aa2f7';
+            ctx.letterSpacing = '4px';
+            ctx.fillText(sub.toUpperCase(), 512, 160);
+
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // --- Geometry Builders ---
+        
+        // 1. The Helix Path
+        const curvePoints = [];
+        for(let i=0; i <= projects.length; i++) {
+            const t = i / projects.length;
+            const angle = t * Math.PI * 4; // 2 full turns
+            const x = Math.cos(angle) * config.helixRadius;
+            const z = Math.sin(angle) * config.helixRadius;
+            const y = -(t * config.helixHeight) + (config.helixHeight / 2);
+            curvePoints.push(new THREE.Vector3(x, y, z));
+        }
+        const helixCurve = new THREE.CatmullRomCurve3(curvePoints);
+        
+        // Draw the path line
+        const pathGeo = new THREE.BufferGeometry().setFromPoints(helixCurve.getPoints(200));
+        const pathMat = new THREE.LineBasicMaterial({ color: PALETTE.line, transparent: true, opacity: 0.2 });
+        const pathLine = new THREE.Line(pathGeo, pathMat);
+        scene.add(pathLine);
+
+        // 2. Project Nodes
+        const projectNodes = [];
+        const clickableObjects = [];
+
+        projects.forEach((proj, index) => {
+            const t = index / (projects.length - 1);
+            const point = helixCurve.getPointAt(t);
+            const tangent = helixCurve.getTangentAt(t);
+
+            const group = new THREE.Group();
+            group.position.copy(point);
+            group.userData = { id: proj.id, data: proj };
+
+            // A. Central Geometry (Abstract Flower/Core)
+            const geo = new THREE.IcosahedronGeometry(0.8, 0);
+            const mat = new THREE.MeshBasicMaterial({ 
+                color: PALETTE.bg, 
+                wireframe: true,
+                transparent: true, 
+                opacity: 0.5 
+            });
+            const mesh = new THREE.Mesh(geo, mat);
+            
+            // Glow Core
+            const coreGeo = new THREE.SphereGeometry(0.3, 16, 16);
+            const coreMat = new THREE.MeshBasicMaterial({ color: PALETTE.highlight });
+            const core = new THREE.Mesh(coreGeo, coreMat);
+            
+            // Rings
+            const ringGeo = new THREE.TorusGeometry(1.2, 0.02, 16, 100);
+            const ringMat = new THREE.MeshBasicMaterial({ color: PALETTE.accent, transparent: true, opacity: 0.3 });
+            const ring = new THREE.Mesh(ringGeo, ringMat);
+            ring.rotation.x = Math.PI / 2;
+
+            group.add(mesh);
+            group.add(core);
+            group.add(ring);
+
+            // B. Text Label Sprite
+            const map = createLabelTexture(proj.title, proj.subtitle);
+            const spriteMat = new THREE.SpriteMaterial({ map: map, transparent: true, opacity: 0.8 });
+            const sprite = new THREE.Sprite(spriteMat);
+            sprite.scale.set(8, 2, 1);
+            sprite.position.y = 1.5;
+            group.add(sprite);
+
+            // C. Invisible Hitbox
+            const hitGeo = new THREE.SphereGeometry(2, 16, 16);
+            const hitMat = new THREE.MeshBasicMaterial({ visible: false });
+            const hitbox = new THREE.Mesh(hitGeo, hitMat);
+            hitbox.userData = { parentGroup: group };
+            group.add(hitbox);
+            clickableObjects.push(hitbox);
+
+            scene.add(group);
+            projectNodes.push({ group, mesh, ring, core, initialY: point.y });
+        });
+
+        // 3. Particles (Starfield)
+        const particlesGeo = new THREE.BufferGeometry();
+        const pCount = 1000;
+        const pPos = new Float32Array(pCount * 3);
+        for(let i=0; i<pCount*3; i++) {
+            pPos[i] = (Math.random() - 0.5) * 60;
+        }
+        particlesGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+        const pMat = new THREE.PointsMaterial({
+            color: PALETTE.line,
+            size: 0.1,
+            transparent: true, opacity: 0.4
+        });
+        const starfield = new THREE.Points(particlesGeo, pMat);
+        scene.add(starfield);
+
+        // 4. Decorative Flowers in Background
+        const flower1 = createFlower(PALETTE.highlight, 1.5);
+        flower1.position.set(-8, 5, -5);
+        scene.add(flower1);
+
+        const flower2 = createFlower(PALETTE.accent, 1.0);
+        flower2.position.set(9, -4, -6);
+        scene.add(flower2);
+
+        const flower3 = createFlower(PALETTE.highlight, 0.8);
+        flower3.position.set(-6, -6, -4);
+        scene.add(flower3);
+
+        const flower4 = createFlower(PALETTE.accent, 1.2);
+        flower4.position.set(7, 6, -7);
+        scene.add(flower4);
+
+        // 5. Falling Sakura Petals
+        const petalCount = 250;
+        const petalGeo = new THREE.BufferGeometry();
+        const petalPos = new Float32Array(petalCount * 3);
+        const petalSpeed = new Float32Array(petalCount);
+        const petalWobble = new Float32Array(petalCount);
+
+        for(let i = 0; i < petalCount; i++) {
+            petalPos[i*3] = (Math.random() - 0.5) * 50;
+            petalPos[i*3+1] = (Math.random() - 0.5) * 40;
+            petalPos[i*3+2] = (Math.random() - 0.5) * 20;
+
+            petalSpeed[i] = Math.random() * 0.015 + 0.005;
+            petalWobble[i] = Math.random() * Math.PI * 2;
+        }
+
+        petalGeo.setAttribute('position', new THREE.BufferAttribute(petalPos, 3));
+        petalGeo.setAttribute('speed', new THREE.BufferAttribute(petalSpeed, 1));
+        petalGeo.setAttribute('wobble', new THREE.BufferAttribute(petalWobble, 1));
+
+        const petalMat = new THREE.PointsMaterial({
+            color: PALETTE.highlight,
+            size: 0.25,
+            map: createPetalTexture(),
+            transparent: true,
+            opacity: 0.6,
+            alphaTest: 0.01,
+            blending: THREE.AdditiveBlending
+        });
+
+        petalSystem = new THREE.Points(petalGeo, petalMat);
+        scene.add(petalSystem);
+
+        // --- Interaction ---
+        
+        // Scroll Logic
+        window.addEventListener('wheel', (e) => {
+            targetScroll += e.deltaY * 0.0005;
+            targetScroll = Math.max(0, Math.min(1, targetScroll));
+        });
+
+        // Touch Logic
+        let touchStart = 0;
+        window.addEventListener('touchstart', (e) => touchStart = e.touches[0].clientY);
+        window.addEventListener('touchmove', (e) => {
+            const delta = touchStart - e.touches[0].clientY;
+            targetScroll += delta * 0.002;
+            targetScroll = Math.max(0, Math.min(1, targetScroll));
+            touchStart = e.touches[0].clientY;
+        });
+
+        // Click Logic
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        window.addEventListener('click', (e) => {
+            if(document.getElementById('project-modal').classList.contains('active')) return;
+
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+            
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(clickableObjects);
+            
+            if(intersects.length > 0) {
+                const data = intersects[0].object.userData.parentGroup.userData.data;
+                openModal(data);
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(clickableObjects);
+            document.body.style.cursor = intersects.length > 0 ? 'pointer' : 'default';
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // UI Functions
+        window.openModal = (data) => {
+            const modal = document.getElementById('project-modal');
+            const content = document.getElementById('modal-inner');
+            
+            const techList = data.tech.map(t => `<li>${t}</li>`).join('');
+
+            content.innerHTML = `
+                <div class="tag">${data.tags}</div>
+                <h2 class="modal-title">${data.title}</h2>
+                <div class="modal-section">
+                    <p>${data.description}</p>
+                </div>
+                
+                <div class="modal-section">
+                    <h3>Architecture & Tech</h3>
+                    <ul>${techList}</ul>
+                </div>
+
+                <div class="modal-section">
+                    <h3>Engineering Challenges</h3>
+                    <p>${data.challenges}</p>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        };
+
+        window.closeModal = () => {
+            document.getElementById('project-modal').classList.remove('active');
+        };
+
+        // Why Panel Toggle Function
+        window.toggleWhyPanel = () => {
+            const panel = document.getElementById('why-panel');
+            const toggle = document.getElementById('why-toggle');
+            panel.classList.toggle('visible');
+            toggle.classList.toggle('hidden');
+        };
+
+        // Prevent scroll propagation when hovering over the panel
+        const whyPanel = document.getElementById('why-panel');
+        whyPanel.addEventListener('wheel', (e) => {
+            const isScrollable = whyPanel.scrollHeight > whyPanel.clientHeight;
+            if (isScrollable) {
+                const isAtTop = whyPanel.scrollTop === 0;
+                const isAtBottom = whyPanel.scrollTop + whyPanel.clientHeight >= whyPanel.scrollHeight;
+
+                // Prevent propagation if scrolling within bounds
+                if ((e.deltaY < 0 && !isAtTop) || (e.deltaY > 0 && !isAtBottom)) {
+                    e.stopPropagation();
+                } else if ((e.deltaY < 0 && isAtTop) || (e.deltaY > 0 && isAtBottom)) {
+                    // At boundary, prevent propagation entirely
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+            } else {
+                // Not scrollable, prevent main page scroll
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, { passive: false });
+
+        // Close modals with Escape key
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                const panel = document.getElementById('why-panel');
+                const toggle = document.getElementById('why-toggle');
+                if (panel.classList.contains('visible')) {
+                    panel.classList.remove('visible');
+                    toggle.classList.remove('hidden');
+                }
+            }
+        });
+
+        // Close project modal when clicking outside (on the background)
+        document.addEventListener('click', (e) => {
+            const modal = document.getElementById('project-modal');
+            if (modal.classList.contains('active')) {
+                // Check if click is outside modal content area
+                const rect = modal.getBoundingClientRect();
+                if (e.clientX < rect.left) {
+                    closeModal();
+                }
+            }
+        });
+
+        // --- Animation Loop ---
+        const clock = new THREE.Clock();
+
+        function animate() {
+            requestAnimationFrame(animate);
+            const time = clock.getElapsedTime();
+
+            // 1. Smooth Scroll Physics
+            scrollProgress += (targetScroll - scrollProgress) * 0.05;
+            
+            // Update UI Bar
+            document.getElementById('progress-bar').style.height = `${scrollProgress * 100}%`;
+
+            // 2. Camera Movement
+            // Calculate position on curve
+            const camPos = helixCurve.getPointAt(scrollProgress);
+            const lookAtPos = helixCurve.getPointAt(Math.min(scrollProgress + 0.1, 1));
+            
+            // Offset camera slightly from the curve to see the nodes
+            camera.position.set(
+                camPos.x + Math.cos(time * 0.1) * 2, 
+                camPos.y + 2, 
+                camPos.z + 10
+            );
+            camera.lookAt(camPos);
+
+            // 3. Node Animation
+            projectNodes.forEach((node, i) => {
+                // Rotation
+                node.mesh.rotation.x = time * 0.5 + i;
+                node.mesh.rotation.y = time * 0.3;
+                node.ring.rotation.z = -time * 0.2;
+                
+                // Pulse size based on proximity to camera focus
+                const dist = Math.abs(scrollProgress - (i / (projects.length - 1)));
+                const scale = dist < 0.1 ? 1.5 : 1.0;
+                
+                node.group.scale.setScalar(THREE.MathUtils.lerp(node.group.scale.x, scale, 0.1));
+                
+                // Hover effect color
+                node.core.material.color.setHex(dist < 0.05 ? PALETTE.highlight : PALETTE.white);
+            });
+
+            // 4. Starfield Drift
+            starfield.rotation.y = time * 0.02;
+
+            // 5. Animate Background Flowers
+            flowerInstances.forEach(instance => {
+                instance.group.rotation.z = time * 0.08;
+
+                instance.petals.forEach((pivot) => {
+                    const breathe = 0.5 + Math.sin(time * 1.5 + instance.offset) * 0.3;
+                    pivot.rotation.x = breathe;
+                });
+            });
+
+            // 6. Animate Falling Petals
+            if (petalSystem) {
+                const positions = petalSystem.geometry.attributes.position.array;
+                const speeds = petalSystem.geometry.attributes.speed.array;
+                const wobbles = petalSystem.geometry.attributes.wobble.array;
+                const particleCount = positions.length / 3;
+
+                for(let i = 0; i < particleCount; i++) {
+                    positions[i*3+1] -= speeds[i];
+                    positions[i*3] += Math.sin(time + wobbles[i]) * 0.008;
+
+                    if(positions[i*3+1] < -20) {
+                        positions[i*3+1] = 20;
+                        positions[i*3] = (Math.random() - 0.5) * 50;
+                    }
+                }
+                petalSystem.geometry.attributes.position.needsUpdate = true;
+                petalSystem.rotation.y = time * 0.03;
+            }
+
+            composer.render();
+        }
+
+        // Start at top
+        camera.position.copy(helixCurve.getPointAt(0));
+        camera.position.z += 10;
+        
+        animate();
+
+    </script>
+</body>
+</html>
